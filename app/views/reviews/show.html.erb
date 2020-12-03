@@ -13,6 +13,18 @@
   </div>
 <% end %>
 
+<% if @review.price.present? %>
+  <div class="price">
+    Price: <%= @review.price %>
+  </div>
+<% end %>
+
+<% if @review.cuisine.present? %>
+  <div class="cuisine">
+    Cuisine: <%= @review.cuisine %>
+  </div>
+<% end %>
+
 <div class="body">
   <%= simple_format @review.body %>
 </div>
@@ -21,3 +33,21 @@
   <%= link_to "Edit this review", edit_review_path(@review) %>
   <%= link_to "Delete this review", review_path(@review), method: :delete, data: { confirm: "Are your sure??" } %>
 </div>
+
+<h3>Comments</h3>
+
+<% @review.comments.order("created_at desc").each do |comment| %>
+  <div class="comment">
+    <%= simple_format comment.body %>
+
+    <p class="posted">Posted <%= time_ago_in_words comment.created_at %> ago</p>
+  </div>
+<% end %>
+
+
+<h3>Add a comment</h3>
+
+<%= simple_form_for [@review, Comment.new] do |f| %>
+  <%= f.input :body %>
+  <%= f.button:submit, "Add comment" %>
+<% end %>
