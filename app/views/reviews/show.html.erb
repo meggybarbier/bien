@@ -3,8 +3,46 @@
 <h1><%= @review.title %></h1>
 <h2><% @review.restaurant %></h2>
 
+
+<% if is_logged_in? %>
+
+  <p>
+
+    <% if @review.bookmarks.where(user: @current_user).any? %>
+
+      <%= link_to "Unbookmark", review_bookmark_path(@review), method: :delete %>
+
+    <% else %>
+      <%= link_to "Bookmark", review_bookmark_path(@review), method: :post %>
+    <% end %>
+  </p>
+
+<% end %> 
+
+<h3>Bookmark by...</h3>
+
+<ul>
+  <% @review.bookmarks.each do |bookmark| %>
+
+   <li><%= bookmark.user.username %></li>
+   
+  <% end %>
+</ul>
+
+
+
 <div class="score">
   <%= @review.score %> / 10
+</div>
+
+<div class="user">
+  Posted by
+
+  <% if @review.user.present? %>
+    <%= link_to @review.user.username, user_path(@review.user) %>
+  <% else %>
+    anonymous
+  <% end %>
 </div>
 
 <% if @review.ambiance.present? %>
@@ -29,16 +67,27 @@
   <%= simple_format @review.body %>
 </div>
 
+<% if @review.user == @current_user %>
 <div class="actions">
   <%= link_to "Edit this review", edit_review_path(@review) %>
   <%= link_to "Delete this review", review_path(@review), method: :delete, data: { confirm: "Are your sure??" } %>
 </div>
+<% end %>
 
 <h3>Comments</h3>
 
 <% @review.comments.order("created_at desc").each do |comment| %>
   <div class="comment">
     <%= simple_format comment.body %>
+
+    <p class="posted">
+      Posted by
+        <% if comment.user.present? %>
+          <%= link_to comment.user.username, user_path(comment.user) %>
+        <% else %>
+          anonymous
+        <% end %>
+    </p>
 
     <p class="posted">Posted <%= time_ago_in_words comment.created_at %> ago</p>
   </div>
